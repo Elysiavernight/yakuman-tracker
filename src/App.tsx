@@ -138,7 +138,7 @@ export function App() {
   const pinnedCount = posts.filter(
     (post) => post.userId === user?.id && post.pinned,
   ).length;
-  const postCard = (post: Post) => (
+  const renderPostCard = (post: Post, showPinned = false) => (
     <PostCard
       key={post.id}
       post={post}
@@ -146,7 +146,7 @@ export function App() {
       onProfile={() => go("profile", post.userId)}
       onDelete={() => setDeleting(post)}
       onProof={() => setProof(post)}
-      showPinned={location.page === "profile"}
+      showPinned={showPinned}
       onPin={
         location.page === "profile" ? () => void togglePin(post) : undefined
       }
@@ -157,6 +157,7 @@ export function App() {
       }
     />
   );
+  const postCard = (post: Post) => renderPostCard(post);
   return (
     <>
       <a
@@ -215,6 +216,7 @@ export function App() {
             onLogin={() => setAuth("login")}
             addRecord={addRecord}
             postCard={postCard}
+            pinnedPostCard={(post) => renderPostCard(post, true)}
           />
         )}
       </main>

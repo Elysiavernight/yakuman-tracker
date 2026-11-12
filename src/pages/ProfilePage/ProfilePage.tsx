@@ -5,6 +5,7 @@ import { Loading } from "../../components/Feedback/Feedback";
 import { ProfileHeader } from "../../components/profile/ProfileHeader/ProfileHeader";
 import { ProfileStats } from "../../components/profile/ProfileStats/ProfileStats";
 import { YakumanCollection } from "../../components/profile/YakumanCollection/YakumanCollection";
+import { PinnedYakumans } from "../../components/profile/PinnedYakumans/PinnedYakumans";
 
 export function ProfilePage({
   profile,
@@ -17,6 +18,7 @@ export function ProfilePage({
   onLogin,
   addRecord,
   postCard,
+  pinnedPostCard,
 }: {
   profile: User | null;
   user: User | null;
@@ -28,11 +30,11 @@ export function ProfilePage({
   onLogin: () => void;
   addRecord: () => void;
   postCard: (post: Post) => ReactNode;
+  pinnedPostCard: (post: Post) => ReactNode;
 }) {
   const own = Boolean(profile && user?.id === profile.id);
-  const profilePosts = posts
-    .filter((post) => post.userId === profile?.id)
-    .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
+  const profilePosts = posts.filter((post) => post.userId === profile?.id);
+  const pinnedPosts = profilePosts.filter((post) => post.pinned);
   return (
     <section className="pt-[45px] max-[700px]:pt-7">
       {profileLoading ? (
@@ -48,47 +50,54 @@ export function ProfilePage({
             onLogout={onLogout}
           />
           <ProfileStats profile={profile} posts={profilePosts} />
+          <PinnedYakumans
+            posts={pinnedPosts}
+            own={own}
+            postCard={pinnedPostCard}
+          />
           <YakumanCollection posts={profilePosts} />
-          <div className="mb-[22px] flex items-center justify-between gap-[15px] [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-[-.9px] max-[430px]:[&_h2]:text-[22px] mt-[42px]">
-            <div>
-              <h2>The memories</h2>
+          <section aria-label="Yakuman memories">
+            <div className="mb-[22px] flex items-center justify-between gap-[15px] [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-[-.9px] max-[430px]:[&_h2]:text-[22px] mt-[42px]">
+              <div>
+                <h2>The memories</h2>
+                {own && (
+                  <p className="mt-1 text-xs text-muted">
+                    {pinnedPosts.length}/3 pinned · Pin posts to feature them
+                    above without moving your memories.
+                  </p>
+                )}
+              </div>
               {own && (
-                <p className="mt-1 text-xs text-muted">
-                  {profilePosts.filter((post) => post.pinned).length}/3 pinned ·
-                  Pin your favorite posts to keep them at the top.
-                </p>
+                <button
+                  className="inline-flex min-h-9 items-center justify-center gap-[7px] border-0 bg-transparent py-2 text-xs text-accent hover:underline max-[700px]:min-h-11"
+                  onClick={addRecord}
+                >
+                  <Icon name="plus" size={16} />
+                  Add a hand
+                </button>
               )}
             </div>
-            {own && (
-              <button
-                className="inline-flex min-h-9 items-center justify-center gap-[7px] border-0 bg-transparent py-2 text-xs text-accent hover:underline max-[700px]:min-h-11"
-                onClick={addRecord}
-              >
-                <Icon name="plus" size={16} />
-                Add a hand
-              </button>
-            )}
-          </div>
-          <div className="grid grid-cols-2 items-start gap-5 max-[850px]:grid-cols-1 [&_article_h3]:text-xl">
-            {profilePosts.length ? (
-              profilePosts.map(postCard)
-            ) : (
-              <Empty
-                title="The best hands are still ahead."
-                text="Your recorded yakuman will appear here."
-                action={
-                  own ? (
-                    <button
-                      className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-lg border px-[17px] py-2.5 text-xs font-semibold whitespace-nowrap max-[700px]:min-h-11 border-transparent bg-accent text-accent-ink shadow-sm hover:bg-accent-hover"
-                      onClick={addRecord}
-                    >
-                      Record your first yakuman
-                    </button>
-                  ) : undefined
-                }
-              />
-            )}
-          </div>
+            <div className="grid grid-cols-2 items-start gap-5 max-[850px]:grid-cols-1 [&_article_h3]:text-xl">
+              {profilePosts.length ? (
+                profilePosts.map(postCard)
+              ) : (
+                <Empty
+                  title="The best hands are still ahead."
+                  text="Your recorded yakuman will appear here."
+                  action={
+                    own ? (
+                      <button
+                        className="inline-flex min-h-[42px] items-center justify-center gap-2 rounded-lg border px-[17px] py-2.5 text-xs font-semibold whitespace-nowrap max-[700px]:min-h-11 border-transparent bg-accent text-accent-ink shadow-sm hover:bg-accent-hover"
+                        onClick={addRecord}
+                      >
+                        Record your first yakuman
+                      </button>
+                    ) : undefined
+                  }
+                />
+              )}
+            </div>
+          </section>
         </>
       ) : (
         <Empty
