@@ -30,7 +30,9 @@ export function ProfilePage({
   postCard: (post: Post) => ReactNode;
 }) {
   const own = Boolean(profile && user?.id === profile.id);
-  const profilePosts = posts.filter((post) => post.userId === profile?.id);
+  const profilePosts = posts
+    .filter((post) => post.userId === profile?.id)
+    .sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
   return (
     <section className="pt-[45px] max-[700px]:pt-7">
       {profileLoading ? (
@@ -48,7 +50,15 @@ export function ProfilePage({
           <ProfileStats profile={profile} posts={profilePosts} />
           <YakumanCollection posts={profilePosts} />
           <div className="mb-[22px] flex items-center justify-between gap-[15px] [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-[-.9px] max-[430px]:[&_h2]:text-[22px] mt-[42px]">
-            <h2>The memories</h2>
+            <div>
+              <h2>The memories</h2>
+              {own && (
+                <p className="mt-1 text-xs text-muted">
+                  {profilePosts.filter((post) => post.pinned).length}/3 pinned ·
+                  Pin your favorite posts to keep them at the top.
+                </p>
+              )}
+            </div>
             {own && (
               <button
                 className="inline-flex min-h-9 items-center justify-center gap-[7px] border-0 bg-transparent py-2 text-xs text-accent hover:underline max-[700px]:min-h-11"

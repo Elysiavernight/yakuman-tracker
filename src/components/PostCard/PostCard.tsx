@@ -10,6 +10,10 @@ export function PostCard({
   onDelete,
   onProof,
   onEdit,
+  onPin,
+  showPinned = false,
+  pinBusy = false,
+  pinDisabled = false,
 }: {
   post: Post;
   own: boolean;
@@ -17,6 +21,10 @@ export function PostCard({
   onDelete: () => void;
   onProof: () => void;
   onEdit?: () => void;
+  onPin?: () => void;
+  showPinned?: boolean;
+  pinBusy?: boolean;
+  pinDisabled?: boolean;
 }) {
   const { getYakuman } = useCatalog();
   const y = getYakuman(post.types[0]!);
@@ -26,6 +34,11 @@ export function PostCard({
   );
   return (
     <article className="rounded-[14px] border border-line bg-surface overflow-hidden px-6 pt-[23px] min-[1400px]:px-[27px] min-[1400px]:pt-[25px] max-[1050px]:px-5 max-[430px]:px-[17px] max-[430px]:pt-[19px]">
+      {showPinned && post.pinned && (
+        <div className="mb-3 flex items-center gap-1.5 text-xs font-medium text-accent">
+          <Icon name="pin" size={14} /> Pinned
+        </div>
+      )}
       <header className="flex items-start justify-between gap-[14px] max-[430px]:gap-2">
         <button
           className="flex min-w-0 items-center gap-2.5 border-0 bg-transparent p-0 text-left [&_strong]:block [&_strong]:text-sm [&_strong]:font-semibold [&_strong]:[overflow-wrap:anywhere] [&:hover_strong]:text-accent [&_small]:mt-[3px] [&_small]:flex [&_small]:flex-wrap [&_small]:items-center [&_small]:gap-1.5 [&_small]:text-[11px] [&_small]:text-muted max-[430px]:[&_strong]:text-[13px] max-[430px]:[&_small]:gap-1 max-[430px]:[&_small]:text-[10px]"
@@ -96,7 +109,7 @@ export function PostCard({
           </span>
         </button>
       )}
-      <footer className="mt-[22px] flex min-h-[49px] items-center justify-between border-t border-line text-[11px] text-muted [&>div>span]:flex [&>div>span]:items-center [&>div>span]:gap-[7px] [&_a]:flex [&_a]:min-h-11 [&_a]:items-center [&_a]:gap-[7px] [&_a:hover]:text-accent max-[700px]:min-h-[52px] max-[700px]:text-xs">
+      <footer className="mt-[22px] flex min-h-[49px] flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-line py-1 text-[11px] text-muted [&>div>span]:flex [&>div>span]:items-center [&>div>span]:gap-[7px] [&_a]:flex [&_a]:min-h-11 [&_a]:items-center [&_a]:gap-[7px] [&_a:hover]:text-accent max-[700px]:min-h-[52px] max-[700px]:text-xs">
         <div>
           {post.gameLink ? (
             <a href={post.gameLink} target="_blank" rel="noopener noreferrer">
@@ -111,7 +124,27 @@ export function PostCard({
           )}
         </div>
         {own ? (
-          <div className="flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1">
+            {onPin && (
+              <button
+                type="button"
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 text-accent hover:bg-raised disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={onPin}
+                disabled={pinDisabled}
+                aria-label={
+                  post.pinned ? "Unpin yakuman record" : "Pin yakuman record"
+                }
+                aria-pressed={Boolean(post.pinned)}
+                title={
+                  pinDisabled && !pinBusy && !post.pinned
+                    ? "You can pin up to 3 posts. Unpin one first."
+                    : undefined
+                }
+              >
+                <Icon name="pin" size={16} />
+                {pinBusy ? "Saving…" : post.pinned ? "Unpin" : "Pin"}
+              </button>
+            )}
             {onEdit && (
               <button
                 type="button"

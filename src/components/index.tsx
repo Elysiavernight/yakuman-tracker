@@ -72,6 +72,7 @@ const paths: Record<string, ReactNode> = {
   close: <path d="m6 6 12 12M6 18 18 6" />,
   check: <path d="m5 12 4 4L19 6" />,
   edit: <path d="m15 4 5 5M3 21l5-1L21 7a2 2 0 0 0-5-5L3 15Z" />,
+  pin: <path d="m16 3 5 5-4 1-4 4v4l-2 2-6-6 2-2h4l4-4 1-4ZM2 22l6-6" />,
   logout: <path d="M9 3H4v18h5m5-14 5 5-5 5M8 12h13" />,
   clock: (
     <>

@@ -11,6 +11,7 @@ import { RecordDialogs } from "./components/RecordDialogs/RecordDialogs";
 import { HomePage } from "./pages/HomePage/HomePage";
 import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 import { LeaderboardPage } from "./pages/LeaderboardPage/LeaderboardPage";
+import { usePostPin } from "./hooks/usePostPin/usePostPin";
 
 const emptyStats: Stats = {
   total: 0,
@@ -43,6 +44,7 @@ export function App() {
   const [deleting, setDeleting] = useState<Post | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [proof, setProof] = useState<Post | null>(null);
+  const { pinningId, togglePin } = usePostPin(setPosts, setNotice);
   const refresh = useCallback(async () => {
     setError("");
     try {
@@ -133,6 +135,9 @@ export function App() {
       setDeleteBusy(false);
     }
   }
+  const pinnedCount = posts.filter(
+    (post) => post.userId === user?.id && post.pinned,
+  ).length;
   const postCard = (post: Post) => (
     <PostCard
       key={post.id}
@@ -141,6 +146,12 @@ export function App() {
       onProfile={() => go("profile", post.userId)}
       onDelete={() => setDeleting(post)}
       onProof={() => setProof(post)}
+      showPinned={location.page === "profile"}
+      onPin={
+        location.page === "profile" ? () => void togglePin(post) : undefined
+      }
+      pinBusy={pinningId === post.id}
+      pinDisabled={pinningId !== null || (!post.pinned && pinnedCount >= 3)}
       onEdit={
         location.page === "profile" ? () => setEditingPost(post) : undefined
       }
