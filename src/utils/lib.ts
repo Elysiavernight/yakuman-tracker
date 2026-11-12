@@ -1,7 +1,15 @@
+const apiBase = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
+
 export async function api<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`/api${path}`, {
+  const response = await fetch(`${apiBase}${path}`, {
     ...options,
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    credentials: "include",
+    headers: {
+      ...(options?.body !== undefined
+        ? { "Content-Type": "application/json" }
+        : {}),
+      ...options?.headers,
+    },
   });
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) {
