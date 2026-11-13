@@ -62,7 +62,7 @@ export function AppHeader({
           </button>
           {user ? (
             <button
-              className="rounded-[13px] border-0 bg-transparent p-0 data-[active=true]:outline-2 data-[active=true]:outline-offset-3 data-[active=true]:outline-accent"
+              className="rounded-[13px] border-0 bg-transparent p-0"
               data-active={page === "profile"}
               aria-label="My profile"
               onClick={() => onProfile(user.id)}
