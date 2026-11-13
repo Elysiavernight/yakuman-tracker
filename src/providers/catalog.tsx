@@ -5,7 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { api } from "../utils/lib";
+import { api, prefetchApi } from "../utils/lib";
 import type { Catalog, Yakuman } from "../types";
 
 const CatalogContext = createContext<Catalog | null>(null);
@@ -18,6 +18,7 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const controller = new AbortController();
     setError("");
+    for (const path of ["/posts", "/stats", "/auth/me"]) prefetchApi(path);
     api<Catalog>("/catalog", { signal: controller.signal })
       .then((data) => {
         if (!data.yakumans?.length || !data.tileIds?.length) {

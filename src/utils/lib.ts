@@ -1,6 +1,24 @@
 const apiBase = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
+const prefetched = new Map<string, Promise<unknown>>();
+
+export function prefetchApi(path: string) {
+  if (prefetched.has(path)) return;
+  const request = requestApi<unknown>(path);
+  prefetched.set(path, request);
+  // A failed catalog can prevent the app from mounting to consume these.
+  void request.catch(() => {});
+}
 
 export async function api<T>(path: string, options?: RequestInit): Promise<T> {
+  if (!options && prefetched.has(path)) {
+    const request = prefetched.get(path)!;
+    prefetched.delete(path);
+    return request as Promise<T>;
+  }
+  return requestApi<T>(path, options);
+}
+
+async function requestApi<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${apiBase}${path}`, {
     ...options,
     credentials: "include",

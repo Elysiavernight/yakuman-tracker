@@ -101,7 +101,12 @@ export function PostCard({
           className="relative mt-[17px] w-full overflow-hidden rounded-[7px] border border-line bg-inset p-0 hover:border-accent [&>img]:max-h-[260px] [&>img]:w-full [&>img]:object-cover [&>span]:flex [&>span]:items-center [&>span]:gap-[7px] [&>span]:px-[13px] [&>span]:py-2.5 [&>span]:text-[11px] [&>span]:text-muted [&>span>svg:last-child]:ml-auto"
           onClick={onProof}
         >
-          <img src={post.image} alt="Winning screenshot" loading="lazy" />
+          <img
+            src={post.imageThumbnail || post.image}
+            alt="Winning screenshot"
+            loading="lazy"
+            decoding="async"
+          />
           <span>
             <Icon name="image" size={16} />
             View screenshot

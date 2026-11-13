@@ -47,20 +47,19 @@ export function App() {
   const { pinningId, togglePin } = usePostPin(setPosts, setNotice);
   const refresh = useCallback(async () => {
     setError("");
-    try {
-      const [feed, summary, session] = await Promise.all([
-        api<{ posts: Post[] }>("/posts"),
-        api<Stats>("/stats"),
-        api<{ user: User | null }>("/auth/me"),
-      ]);
-      setPosts(feed.posts);
-      setStats(summary);
-      setUser(session.user);
-    } catch (err) {
-      setError((err as Error).message);
-    } finally {
-      setLoading(false);
-    }
+    const failed = (err: unknown) => setError((err as Error).message);
+    await Promise.all([
+      api<{ posts: Post[] }>("/posts")
+        .then((feed) => setPosts(feed.posts))
+        .catch(failed)
+        .finally(() => setLoading(false)),
+      api<Stats>("/stats")
+        .then(setStats)
+        .catch((err: Error) => setNotice(err.message)),
+      api<{ user: User | null }>("/auth/me")
+        .then((session) => setUser(session.user))
+        .catch((err: Error) => setNotice(err.message)),
+    ]);
   }, []);
   useEffect(() => {
     void refresh();
